@@ -22,10 +22,10 @@ internal static class Commands
     {
         var name = args.Length > 1 ? args[1] : string.Empty;
         var command = Command.Get(name);
-        Console.WriteLine(command.Type switch
+        Console.WriteLine(command switch
         {
-            CommandType.BuiltIn => $"{name} is a shell builtin",
-            CommandType.External => $"{name} is {command.Path}",
+            BuiltInCommand => $"{name} is a shell builtin",
+            ExternalCommand c => $"{name} is {c.Path}",
             _ => $"{name}: not found"
         });
         return CommandResult.Continue;

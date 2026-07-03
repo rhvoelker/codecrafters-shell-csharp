@@ -3,12 +3,14 @@ using System.Reflection;
 
 namespace CodeCrafters.Shell;
 
-internal class Command
+internal abstract class Command
 {
-    public static Command Get(string name) => 
-        GetBuiltInCommand(name) 
+    public static Command Get(string name) =>
+        GetBuiltInCommand(name)
             ?? GetExternalCommand(name)
-            ?? GetNotFoundCommand(name);
+            ?? new NotFoundCommand(name);
+
+    public abstract CommandResult Invoke(string[] args);
 
     private static Command? GetBuiltInCommand(string name)
     {
@@ -17,8 +19,7 @@ internal class Command
             .FirstOrDefault(m => string.Equals(m.Name, name, StringComparison.InvariantCultureIgnoreCase));
 
         return func is not null
-            ? new Command(
-                CommandType.BuiltIn,
+            ? new BuiltInCommand(
                 (Func<string[], CommandResult>)Delegate.CreateDelegate(typeof(Func<string[], CommandResult>), func))
             : null;
     }
@@ -33,55 +34,50 @@ internal class Command
             .FirstOrDefault(FilePermissionsHelper.CanExecute);
 
         return !string.IsNullOrEmpty(commandPath)
-            ? new Command(
-                CommandType.External,
-                args =>
-                {
-                    using var process = new Process();
-                    process.StartInfo.WorkingDirectory = System.IO.Path.GetDirectoryName(commandPath);
-                    process.StartInfo.FileName = name;
-                    process.StartInfo.Arguments = args.Length > 1 ? string.Join(' ', args[1..]) : string.Empty;
-                    process.StartInfo.UseShellExecute = false;
-                    process.StartInfo.RedirectStandardOutput = true;
-                    process.StartInfo.WindowStyle = ProcessWindowStyle.Hidden;
-                    process.StartInfo.CreateNoWindow = true;
-                    process.Start();
-
-                    while (!process.StandardOutput.EndOfStream)
-                    {
-                        Console.WriteLine(process.StandardOutput.ReadLine());
-                    }
-                    
-                    process.WaitForExit();
-                    
-                    return CommandResult.Continue;
-                },
-                commandPath)
+            ? new ExternalCommand( commandPath)
             : null;
     }
-    
-    private static Command GetNotFoundCommand(string name) => new(
-        CommandType.NotFound,
-        _ =>
+}
+
+internal class BuiltInCommand(Func<string[], CommandResult> func) : Command
+{
+    public override CommandResult Invoke(string[] args) => func(args);
+}
+
+internal class ExternalCommand(string path) : Command
+{
+    public string Path { get; } = path;
+
+    public override CommandResult Invoke(string[] args)
+    {
+        using var process = new Process();
+        process.StartInfo.WorkingDirectory = System.IO.Path.GetDirectoryName(Path);
+        process.StartInfo.FileName = System.IO.Path.GetFileName(Path);
+        process.StartInfo.Arguments = args.Length > 1 ? string.Join(' ', args[1..]) : string.Empty;
+        process.StartInfo.UseShellExecute = false;
+        process.StartInfo.RedirectStandardOutput = true;
+        process.StartInfo.WindowStyle = ProcessWindowStyle.Hidden;
+        process.StartInfo.CreateNoWindow = true;
+        process.Start();
+
+        while (!process.StandardOutput.EndOfStream)
         {
-            Console.WriteLine("{0}: command not found", name);
-            return CommandResult.Continue;
-        });
-
-    private Command(CommandType type, Func<string[], CommandResult> func)
-    {
-        Type = type;
-        Invoke = func;
+            Console.WriteLine(process.StandardOutput.ReadLine());
+        }
+                    
+        process.WaitForExit();
+                    
+        return CommandResult.Continue;
     }
+}
 
-    private Command(CommandType type, Func<string[], CommandResult> func, string path) : this(type, func)
+internal class NotFoundCommand(string name) : Command
+{
+    public override CommandResult Invoke(string[] args)
     {
-        Path = path;
+        Console.WriteLine("{0}: command not found", name);
+        return CommandResult.Continue;
     }
-    
-    public CommandType Type { get; }
-    public Func<string[], CommandResult> Invoke { get; }
-    public string Path { get; } = string.Empty;
 }
 
 internal enum CommandType
