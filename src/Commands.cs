@@ -17,4 +17,15 @@ internal static class Commands
         
         return CommandResult.Continue;
     }
+
+    public static CommandResult Type(string[] args)
+    {
+        var name = args.Length > 1 ? args[1] : string.Empty;
+        Console.WriteLine(
+            Command.Get(name).Exists
+                ? "{0} is a shell builtin"
+                : "{0}: not found",
+            name);
+        return CommandResult.Continue;
+    }
 }
