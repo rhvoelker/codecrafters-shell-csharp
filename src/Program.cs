@@ -8,6 +8,12 @@ internal class Program
         {
             Console.Write("$ ");
             var command = Console.ReadLine();
+
+            if (command == "exit")
+            {
+                break;
+            }
+            
             Console.WriteLine("{0}: command not found", command);
         }
     }
