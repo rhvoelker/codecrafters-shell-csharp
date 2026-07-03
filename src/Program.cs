@@ -15,7 +15,14 @@ internal class Program
             var args = input.Split(' ');
             var command = Command.Get(args[0]);
 
-            result = command.Invoke(args);
+            try
+            {
+                result = command.Invoke(args);
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+            }
         }
     }
 }

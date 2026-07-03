@@ -1,4 +1,5 @@
-﻿using System.Reflection;
+﻿using System.Diagnostics;
+using System.Reflection;
 
 namespace CodeCrafters.Shell;
 
@@ -34,7 +35,27 @@ internal class Command
         return !string.IsNullOrEmpty(commandPath)
             ? new Command(
                 CommandType.External,
-                _ => CommandResult.Continue,
+                args =>
+                {
+                    using var process = new Process();
+                    process.StartInfo.WorkingDirectory = System.IO.Path.GetDirectoryName(commandPath);
+                    process.StartInfo.FileName = name;
+                    process.StartInfo.Arguments = args.Length > 1 ? string.Join(' ', args[1..]) : string.Empty;
+                    process.StartInfo.UseShellExecute = false;
+                    process.StartInfo.RedirectStandardOutput = true;
+                    process.StartInfo.WindowStyle = ProcessWindowStyle.Hidden;
+                    process.StartInfo.CreateNoWindow = true;
+                    process.Start();
+
+                    while (!process.StandardOutput.EndOfStream)
+                    {
+                        Console.WriteLine(process.StandardOutput.ReadLine());
+                    }
+                    
+                    process.WaitForExit();
+                    
+                    return CommandResult.Continue;
+                },
                 commandPath)
             : null;
     }
