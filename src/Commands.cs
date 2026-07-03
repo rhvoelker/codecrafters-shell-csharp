@@ -21,11 +21,13 @@ internal static class Commands
     public static CommandResult Type(string[] args)
     {
         var name = args.Length > 1 ? args[1] : string.Empty;
-        Console.WriteLine(
-            Command.Get(name).Exists
-                ? "{0} is a shell builtin"
-                : "{0}: not found",
-            name);
+        var command = Command.Get(name);
+        Console.WriteLine(command.Type switch
+        {
+            CommandType.BuiltIn => $"{name} is a shell builtin",
+            CommandType.External => $"{name} is {command.Path}",
+            _ => $"{name}: not found"
+        });
         return CommandResult.Continue;
     }
 }
