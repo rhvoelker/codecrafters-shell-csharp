@@ -1,7 +1,11 @@
-class Program
+namespace CodeCrafters.Shell;
+
+internal class Program
 {
-    static void Main()
+    private static void Main()
     {
         Console.Write("$ ");
+        var command = Console.ReadLine();
+        Console.WriteLine("{0}: command not found", command);
     }
 }
