@@ -44,13 +44,20 @@ internal static class Commands
             return CommandResult.Continue;
         }
 
-        if (Directory.Exists(args[1]))
+        var path = args[1];
+
+        if (path.StartsWith("~"))
         {
-            Environment.CurrentDirectory = args[1];
+            path = Environment.GetEnvironmentVariable("HOME") + path[1..];
+        }
+
+        if (Directory.Exists(path))
+        {
+            Environment.CurrentDirectory = path;
         }
         else
         {
-            Console.WriteLine($"cd: {args[1]}: No such file or directory");
+            Console.WriteLine($"cd: {path}: No such file or directory");
         }
 
         return CommandResult.Continue;
