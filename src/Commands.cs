@@ -36,4 +36,23 @@ internal static class Commands
         Console.WriteLine(Environment.CurrentDirectory);
         return CommandResult.Continue;
     }
+    
+    public static CommandResult Cd(string[] args)
+    {
+        if (args.Length == 1)
+        {
+            return CommandResult.Continue;
+        }
+
+        if (Directory.Exists(args[1]))
+        {
+            Environment.CurrentDirectory = args[1];
+        }
+        else
+        {
+            Console.WriteLine($"cd: {args[1]}: No such file or directory");
+        }
+
+        return CommandResult.Continue;
+    }
 }
