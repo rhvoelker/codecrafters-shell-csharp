@@ -29,7 +29,7 @@ internal abstract class Command
         var path = Environment.GetEnvironmentVariable("PATH") ?? string.Empty;
         var paths = path.Split(':');
         var commandPath = paths
-            .Select(p => System.IO.Path.Join(p, name))
+            .Select(p => Path.Join(p, name))
             .Where(File.Exists)
             .FirstOrDefault(FilePermissionsHelper.CanExecute);
 
@@ -78,11 +78,4 @@ internal class NotFoundCommand(string name) : Command
         Console.WriteLine("{0}: command not found", name);
         return CommandResult.Continue;
     }
-}
-
-internal enum CommandType
-{
-    NotFound,
-    BuiltIn,
-    External
 }

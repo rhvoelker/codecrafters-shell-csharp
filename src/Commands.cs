@@ -30,4 +30,10 @@ internal static class Commands
         });
         return CommandResult.Continue;
     }
+
+    public static CommandResult Pwd(string[] args)
+    {
+        Console.WriteLine(Environment.CurrentDirectory);
+        return CommandResult.Continue;
+    }
 }
