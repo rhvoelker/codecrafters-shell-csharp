@@ -53,7 +53,9 @@ internal class ExternalCommand(string path) : Command
         using var process = new Process();
         process.StartInfo.WorkingDirectory = System.IO.Path.GetDirectoryName(Path);
         process.StartInfo.FileName = System.IO.Path.GetFileName(Path);
-        process.StartInfo.Arguments = args.Length > 1 ? string.Join(' ', args[1..]) : string.Empty;
+        process.StartInfo.Arguments = args.Length > 1
+            ? string.Join(' ', args[1..].Select(a => $"\"{a}\""))
+            : string.Empty;
         process.StartInfo.UseShellExecute = false;
         process.StartInfo.RedirectStandardOutput = true;
         process.StartInfo.WindowStyle = ProcessWindowStyle.Hidden;

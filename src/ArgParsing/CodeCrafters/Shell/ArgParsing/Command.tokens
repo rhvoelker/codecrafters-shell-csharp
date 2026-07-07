@@ -1,0 +1,5 @@
+SSTRING=1
+UNQUOTED=2
+D_SQUOTE=3
+WS=4
+'\'\''=3

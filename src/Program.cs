@@ -12,7 +12,7 @@ internal class Program
         {
             Console.Write("$ ");
             var input = Console.ReadLine() ?? string.Empty;
-            var args = input.Split(' ');
+            var args = ArgEvaluator.Eval(input);
             var command = Command.Get(args[0]);
 
             try
