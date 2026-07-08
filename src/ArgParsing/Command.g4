@@ -1,11 +1,11 @@
 ﻿grammar Command;
 
-cmd : arg+ EOF ;
-arg : UNQUOTED
-    | SSTRING
-    ;
+cmd : arg (WS arg)* EOF ;
+arg : (UNQUOTED | SSTRING | DSTRING | D_SQUOTE | D_DQUOTE)+;
 
-SSTRING  : '\'' (D_SQUOTE | (~'\''))+ '\'' ;
-UNQUOTED : (D_SQUOTE | (~[ \t\r\n'"]))+ ;
-D_SQUOTE : '\'\'' ;
-WS       : [ \t\r\n]+ -> skip ;
+SSTRING  : '\'' (~'\'')+ '\'' ;
+DSTRING  : '"' (~'"')+ '"' ;
+UNQUOTED : (~[ \t\r\n'"])+ ;
+D_SQUOTE : '\'\'' -> skip ;
+D_DQUOTE : '""' -> skip ;
+WS       : [ \t\r\n]+;

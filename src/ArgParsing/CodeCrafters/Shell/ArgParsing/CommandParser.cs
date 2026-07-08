@@ -37,7 +37,7 @@ public partial class CommandParser : Parser {
 	protected static DFA[] decisionToDFA;
 	protected static PredictionContextCache sharedContextCache = new PredictionContextCache();
 	public const int
-		SSTRING=1, UNQUOTED=2, D_SQUOTE=3, WS=4;
+		SSTRING=1, DSTRING=2, UNQUOTED=3, D_SQUOTE=4, D_DQUOTE=5, WS=6;
 	public const int
 		RULE_cmd = 0, RULE_arg = 1;
 	public static readonly string[] ruleNames = {
@@ -45,10 +45,10 @@ public partial class CommandParser : Parser {
 	};
 
 	private static readonly string[] _LiteralNames = {
-		null, null, null, "''''"
+		null, null, null, null, "''''", "'\"\"'"
 	};
 	private static readonly string[] _SymbolicNames = {
-		null, "SSTRING", "UNQUOTED", "D_SQUOTE", "WS"
+		null, "SSTRING", "DSTRING", "UNQUOTED", "D_SQUOTE", "D_DQUOTE", "WS"
 	};
 	public static readonly IVocabulary DefaultVocabulary = new Vocabulary(_LiteralNames, _SymbolicNames);
 
@@ -83,12 +83,16 @@ public partial class CommandParser : Parser {
 	}
 
 	public partial class CmdContext : ParserRuleContext {
-		[System.Diagnostics.DebuggerNonUserCode] public ITerminalNode Eof() { return GetToken(CommandParser.Eof, 0); }
 		[System.Diagnostics.DebuggerNonUserCode] public ArgContext[] arg() {
 			return GetRuleContexts<ArgContext>();
 		}
 		[System.Diagnostics.DebuggerNonUserCode] public ArgContext arg(int i) {
 			return GetRuleContext<ArgContext>(i);
+		}
+		[System.Diagnostics.DebuggerNonUserCode] public ITerminalNode Eof() { return GetToken(CommandParser.Eof, 0); }
+		[System.Diagnostics.DebuggerNonUserCode] public ITerminalNode[] WS() { return GetTokens(CommandParser.WS); }
+		[System.Diagnostics.DebuggerNonUserCode] public ITerminalNode WS(int i) {
+			return GetToken(CommandParser.WS, i);
 		}
 		public CmdContext(ParserRuleContext parent, int invokingState)
 			: base(parent, invokingState)
@@ -121,21 +125,25 @@ public partial class CommandParser : Parser {
 		try {
 			EnterOuterAlt(_localctx, 1);
 			{
-			State = 5;
+			State = 4;
+			arg();
+			State = 9;
 			ErrorHandler.Sync(this);
 			_la = TokenStream.LA(1);
-			do {
+			while (_la==WS) {
 				{
 				{
-				State = 4;
+				State = 5;
+				Match(WS);
+				State = 6;
 				arg();
 				}
 				}
-				State = 7;
+				State = 11;
 				ErrorHandler.Sync(this);
 				_la = TokenStream.LA(1);
-			} while ( _la==SSTRING || _la==UNQUOTED );
-			State = 9;
+			}
+			State = 12;
 			Match(Eof);
 			}
 		}
@@ -151,8 +159,26 @@ public partial class CommandParser : Parser {
 	}
 
 	public partial class ArgContext : ParserRuleContext {
-		[System.Diagnostics.DebuggerNonUserCode] public ITerminalNode UNQUOTED() { return GetToken(CommandParser.UNQUOTED, 0); }
-		[System.Diagnostics.DebuggerNonUserCode] public ITerminalNode SSTRING() { return GetToken(CommandParser.SSTRING, 0); }
+		[System.Diagnostics.DebuggerNonUserCode] public ITerminalNode[] UNQUOTED() { return GetTokens(CommandParser.UNQUOTED); }
+		[System.Diagnostics.DebuggerNonUserCode] public ITerminalNode UNQUOTED(int i) {
+			return GetToken(CommandParser.UNQUOTED, i);
+		}
+		[System.Diagnostics.DebuggerNonUserCode] public ITerminalNode[] SSTRING() { return GetTokens(CommandParser.SSTRING); }
+		[System.Diagnostics.DebuggerNonUserCode] public ITerminalNode SSTRING(int i) {
+			return GetToken(CommandParser.SSTRING, i);
+		}
+		[System.Diagnostics.DebuggerNonUserCode] public ITerminalNode[] DSTRING() { return GetTokens(CommandParser.DSTRING); }
+		[System.Diagnostics.DebuggerNonUserCode] public ITerminalNode DSTRING(int i) {
+			return GetToken(CommandParser.DSTRING, i);
+		}
+		[System.Diagnostics.DebuggerNonUserCode] public ITerminalNode[] D_SQUOTE() { return GetTokens(CommandParser.D_SQUOTE); }
+		[System.Diagnostics.DebuggerNonUserCode] public ITerminalNode D_SQUOTE(int i) {
+			return GetToken(CommandParser.D_SQUOTE, i);
+		}
+		[System.Diagnostics.DebuggerNonUserCode] public ITerminalNode[] D_DQUOTE() { return GetTokens(CommandParser.D_DQUOTE); }
+		[System.Diagnostics.DebuggerNonUserCode] public ITerminalNode D_DQUOTE(int i) {
+			return GetToken(CommandParser.D_DQUOTE, i);
+		}
 		public ArgContext(ParserRuleContext parent, int invokingState)
 			: base(parent, invokingState)
 		{
@@ -184,15 +210,27 @@ public partial class CommandParser : Parser {
 		try {
 			EnterOuterAlt(_localctx, 1);
 			{
-			State = 11;
+			State = 15;
+			ErrorHandler.Sync(this);
 			_la = TokenStream.LA(1);
-			if ( !(_la==SSTRING || _la==UNQUOTED) ) {
-			ErrorHandler.RecoverInline(this);
-			}
-			else {
-				ErrorHandler.ReportMatch(this);
-			    Consume();
-			}
+			do {
+				{
+				{
+				State = 14;
+				_la = TokenStream.LA(1);
+				if ( !((((_la) & ~0x3f) == 0 && ((1L << _la) & 62L) != 0)) ) {
+				ErrorHandler.RecoverInline(this);
+				}
+				else {
+					ErrorHandler.ReportMatch(this);
+				    Consume();
+				}
+				}
+				}
+				State = 17;
+				ErrorHandler.Sync(this);
+				_la = TokenStream.LA(1);
+			} while ( (((_la) & ~0x3f) == 0 && ((1L << _la) & 62L) != 0) );
 			}
 		}
 		catch (RecognitionException re) {
@@ -207,10 +245,12 @@ public partial class CommandParser : Parser {
 	}
 
 	private static int[] _serializedATN = {
-		4,1,4,14,2,0,7,0,2,1,7,1,1,0,4,0,6,8,0,11,0,12,0,7,1,0,1,0,1,1,1,1,1,1,
-		0,0,2,0,2,0,1,1,0,1,2,12,0,5,1,0,0,0,2,11,1,0,0,0,4,6,3,2,1,0,5,4,1,0,
-		0,0,6,7,1,0,0,0,7,5,1,0,0,0,7,8,1,0,0,0,8,9,1,0,0,0,9,10,5,0,0,1,10,1,
-		1,0,0,0,11,12,7,0,0,0,12,3,1,0,0,0,1,7
+		4,1,6,20,2,0,7,0,2,1,7,1,1,0,1,0,1,0,5,0,8,8,0,10,0,12,0,11,9,0,1,0,1,
+		0,1,1,4,1,16,8,1,11,1,12,1,17,1,1,0,0,2,0,2,0,1,1,0,1,5,19,0,4,1,0,0,0,
+		2,15,1,0,0,0,4,9,3,2,1,0,5,6,5,6,0,0,6,8,3,2,1,0,7,5,1,0,0,0,8,11,1,0,
+		0,0,9,7,1,0,0,0,9,10,1,0,0,0,10,12,1,0,0,0,11,9,1,0,0,0,12,13,5,0,0,1,
+		13,1,1,0,0,0,14,16,7,0,0,0,15,14,1,0,0,0,16,17,1,0,0,0,17,15,1,0,0,0,17,
+		18,1,0,0,0,18,3,1,0,0,0,2,9,17
 	};
 
 	public static readonly ATN _ATN =

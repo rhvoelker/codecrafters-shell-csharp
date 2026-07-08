@@ -1,4 +1,5 @@
-﻿using System.Text.RegularExpressions;
+﻿using System.Text;
+using System.Text.RegularExpressions;
 
 namespace CodeCrafters.Shell.ArgParsing;
 
@@ -12,16 +13,24 @@ internal partial class ArgListener : CommandBaseListener
     
     public override void EnterArg(CommandParser.ArgContext context)
     {
-        var token = context
-            .SSTRING()
-            ?.GetText()
-            .Replace("'", string.Empty);
+        var arg = new StringBuilder();
         
-        token ??= QuoteRegex.Replace(
-            context.UNQUOTED()?.GetText() ?? string.Empty,
-            string.Empty);
+        foreach (var unquoted in context.UNQUOTED())
+        {
+            arg.Append(unquoted.GetText());
+        }
 
-        _args.Add(token);
+        foreach (var singleQuoted in context.SSTRING())
+        {
+            arg.Append(singleQuoted.GetText().Replace("'", string.Empty));
+        }
+
+        foreach (var doubleQuoted in context.DSTRING())
+        {
+            arg.Append(doubleQuoted.GetText().Replace("\"", string.Empty));
+        }
+
+        _args.Add(arg.ToString());
     }
 
     [GeneratedRegex(@"['""]+")]
