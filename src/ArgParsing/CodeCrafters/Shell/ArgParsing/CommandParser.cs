@@ -37,7 +37,7 @@ public partial class CommandParser : Parser {
 	protected static DFA[] decisionToDFA;
 	protected static PredictionContextCache sharedContextCache = new PredictionContextCache();
 	public const int
-		SSTRING=1, DSTRING=2, UNQUOTED=3, D_SQUOTE=4, D_DQUOTE=5, WS=6;
+		ESCAPE=1, SSTRING=2, DSTRING=3, UNQUOTED=4, D_SQUOTE=5, D_DQUOTE=6, WS=7;
 	public const int
 		RULE_cmd = 0, RULE_arg = 1;
 	public static readonly string[] ruleNames = {
@@ -45,10 +45,11 @@ public partial class CommandParser : Parser {
 	};
 
 	private static readonly string[] _LiteralNames = {
-		null, null, null, null, "''''", "'\"\"'"
+		null, null, null, null, null, "''''", "'\"\"'"
 	};
 	private static readonly string[] _SymbolicNames = {
-		null, "SSTRING", "DSTRING", "UNQUOTED", "D_SQUOTE", "D_DQUOTE", "WS"
+		null, "ESCAPE", "SSTRING", "DSTRING", "UNQUOTED", "D_SQUOTE", "D_DQUOTE", 
+		"WS"
 	};
 	public static readonly IVocabulary DefaultVocabulary = new Vocabulary(_LiteralNames, _SymbolicNames);
 
@@ -179,6 +180,10 @@ public partial class CommandParser : Parser {
 		[System.Diagnostics.DebuggerNonUserCode] public ITerminalNode D_DQUOTE(int i) {
 			return GetToken(CommandParser.D_DQUOTE, i);
 		}
+		[System.Diagnostics.DebuggerNonUserCode] public ITerminalNode[] ESCAPE() { return GetTokens(CommandParser.ESCAPE); }
+		[System.Diagnostics.DebuggerNonUserCode] public ITerminalNode ESCAPE(int i) {
+			return GetToken(CommandParser.ESCAPE, i);
+		}
 		public ArgContext(ParserRuleContext parent, int invokingState)
 			: base(parent, invokingState)
 		{
@@ -218,7 +223,7 @@ public partial class CommandParser : Parser {
 				{
 				State = 14;
 				_la = TokenStream.LA(1);
-				if ( !((((_la) & ~0x3f) == 0 && ((1L << _la) & 62L) != 0)) ) {
+				if ( !((((_la) & ~0x3f) == 0 && ((1L << _la) & 126L) != 0)) ) {
 				ErrorHandler.RecoverInline(this);
 				}
 				else {
@@ -230,7 +235,7 @@ public partial class CommandParser : Parser {
 				State = 17;
 				ErrorHandler.Sync(this);
 				_la = TokenStream.LA(1);
-			} while ( (((_la) & ~0x3f) == 0 && ((1L << _la) & 62L) != 0) );
+			} while ( (((_la) & ~0x3f) == 0 && ((1L << _la) & 126L) != 0) );
 			}
 		}
 		catch (RecognitionException re) {
@@ -245,9 +250,9 @@ public partial class CommandParser : Parser {
 	}
 
 	private static int[] _serializedATN = {
-		4,1,6,20,2,0,7,0,2,1,7,1,1,0,1,0,1,0,5,0,8,8,0,10,0,12,0,11,9,0,1,0,1,
-		0,1,1,4,1,16,8,1,11,1,12,1,17,1,1,0,0,2,0,2,0,1,1,0,1,5,19,0,4,1,0,0,0,
-		2,15,1,0,0,0,4,9,3,2,1,0,5,6,5,6,0,0,6,8,3,2,1,0,7,5,1,0,0,0,8,11,1,0,
+		4,1,7,20,2,0,7,0,2,1,7,1,1,0,1,0,1,0,5,0,8,8,0,10,0,12,0,11,9,0,1,0,1,
+		0,1,1,4,1,16,8,1,11,1,12,1,17,1,1,0,0,2,0,2,0,1,1,0,1,6,19,0,4,1,0,0,0,
+		2,15,1,0,0,0,4,9,3,2,1,0,5,6,5,7,0,0,6,8,3,2,1,0,7,5,1,0,0,0,8,11,1,0,
 		0,0,9,7,1,0,0,0,9,10,1,0,0,0,10,12,1,0,0,0,11,9,1,0,0,0,12,13,5,0,0,1,
 		13,1,1,0,0,0,14,16,7,0,0,0,15,14,1,0,0,0,16,17,1,0,0,0,17,15,1,0,0,0,17,
 		18,1,0,0,0,18,3,1,0,0,0,2,9,17

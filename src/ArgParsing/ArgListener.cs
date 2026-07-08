@@ -1,38 +1,34 @@
 ﻿using System.Text;
-using System.Text.RegularExpressions;
+using Antlr4.Runtime.Tree;
 
 namespace CodeCrafters.Shell.ArgParsing;
 
-internal partial class ArgListener : CommandBaseListener
+internal class ArgListener : CommandBaseListener
 {
-    private static Regex QuoteRegex = ExecQuoteRegex();
-
     private readonly List<string> _args = [];
     
     public string[] Args => _args.ToArray();
     
     public override void EnterArg(CommandParser.ArgContext context)
     {
-        var arg = new StringBuilder();
-        
-        foreach (var unquoted in context.UNQUOTED())
-        {
-            arg.Append(unquoted.GetText());
-        }
-
-        foreach (var singleQuoted in context.SSTRING())
-        {
-            arg.Append(singleQuoted.GetText().Replace("'", string.Empty));
-        }
-
-        foreach (var doubleQuoted in context.DSTRING())
-        {
-            arg.Append(doubleQuoted.GetText().Replace("\"", string.Empty));
-        }
-
-        _args.Add(arg.ToString());
+        _args.Add(string.Join(string.Empty, context
+            .UNQUOTED()
+            .Union(context.SSTRING())
+            .Union(context.DSTRING())
+            .Union(context.ESCAPE())
+            .OrderBy(token => token.Symbol.TokenIndex)
+            .Select<ITerminalNode, string>(token => token.Symbol.Type switch
+            {
+                CommandParser.UNQUOTED => token.GetText(),
+                CommandParser.SSTRING or CommandParser.DSTRING => UnwrapQuotedString(token.GetText()),
+                CommandParser.ESCAPE => Unescape(token.GetText()),
+                _ => string.Empty
+            })));
     }
-
-    [GeneratedRegex(@"['""]+")]
-    private static partial Regex ExecQuoteRegex();
+    
+    private static string UnwrapQuotedString(string s) => s.Length >= 2
+        ? s.Substring(1, s.Length - 2)
+        : s;
+    
+    private static string Unescape(string s) => s.Length > 1 ? s[1..] : s;
 }
