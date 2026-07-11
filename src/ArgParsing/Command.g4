@@ -4,7 +4,7 @@ cmd : arg (WS arg)* EOF ;
 arg : (UNQUOTED | SSTRING | DSTRING | D_SQUOTE | D_DQUOTE | ESCAPE)+ ;
 
 ESCAPE   : '\\' . ;
-SSTRING  : '\'' ('\\\'' | (~[\\']))+ '\'' ;
+SSTRING  : '\'' ('\\\'' | (~[']))+ '\'' ;
 DSTRING  : '"' ('\\"' | (~[\\"]))+ '"' ;
 UNQUOTED : (~[ \\\t\r\n'"])+ ;
 D_SQUOTE : '\'\'' ;
