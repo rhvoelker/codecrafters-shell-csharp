@@ -44,5 +44,54 @@ public interface ICommandVisitor<Result> : IParseTreeVisitor<Result> {
 	/// <param name="context">The parse tree.</param>
 	/// <return>The visitor result.</return>
 	Result VisitArg([NotNull] CommandParser.ArgContext context);
+	/// <summary>
+	/// Visit a parse tree produced by the <c>EscapeCharacter</c>
+	/// labeled alternative in <see cref="CommandParser.str"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	/// <return>The visitor result.</return>
+	Result VisitEscapeCharacter([NotNull] CommandParser.EscapeCharacterContext context);
+	/// <summary>
+	/// Visit a parse tree produced by the <c>UnquotedString</c>
+	/// labeled alternative in <see cref="CommandParser.str"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	/// <return>The visitor result.</return>
+	Result VisitUnquotedString([NotNull] CommandParser.UnquotedStringContext context);
+	/// <summary>
+	/// Visit a parse tree produced by the <c>SingleQuotedString</c>
+	/// labeled alternative in <see cref="CommandParser.str"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	/// <return>The visitor result.</return>
+	Result VisitSingleQuotedString([NotNull] CommandParser.SingleQuotedStringContext context);
+	/// <summary>
+	/// Visit a parse tree produced by the <c>DoubleQuotedString</c>
+	/// labeled alternative in <see cref="CommandParser.str"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	/// <return>The visitor result.</return>
+	Result VisitDoubleQuotedString([NotNull] CommandParser.DoubleQuotedStringContext context);
+	/// <summary>
+	/// Visit a parse tree produced by the <c>SingleStringText</c>
+	/// labeled alternative in <see cref="CommandParser.sstr_inner"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	/// <return>The visitor result.</return>
+	Result VisitSingleStringText([NotNull] CommandParser.SingleStringTextContext context);
+	/// <summary>
+	/// Visit a parse tree produced by the <c>DoubleStringEscapeCharacter</c>
+	/// labeled alternative in <see cref="CommandParser.dstr_inner"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	/// <return>The visitor result.</return>
+	Result VisitDoubleStringEscapeCharacter([NotNull] CommandParser.DoubleStringEscapeCharacterContext context);
+	/// <summary>
+	/// Visit a parse tree produced by the <c>DoubleStringText</c>
+	/// labeled alternative in <see cref="CommandParser.dstr_inner"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	/// <return>The visitor result.</return>
+	Result VisitDoubleStringText([NotNull] CommandParser.DoubleStringTextContext context);
 }
 } // namespace CodeCrafters.Shell.ArgParsing

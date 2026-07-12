@@ -51,5 +51,89 @@ public interface ICommandListener : IParseTreeListener {
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
 	void ExitArg([NotNull] CommandParser.ArgContext context);
+	/// <summary>
+	/// Enter a parse tree produced by the <c>EscapeCharacter</c>
+	/// labeled alternative in <see cref="CommandParser.str"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	void EnterEscapeCharacter([NotNull] CommandParser.EscapeCharacterContext context);
+	/// <summary>
+	/// Exit a parse tree produced by the <c>EscapeCharacter</c>
+	/// labeled alternative in <see cref="CommandParser.str"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	void ExitEscapeCharacter([NotNull] CommandParser.EscapeCharacterContext context);
+	/// <summary>
+	/// Enter a parse tree produced by the <c>UnquotedString</c>
+	/// labeled alternative in <see cref="CommandParser.str"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	void EnterUnquotedString([NotNull] CommandParser.UnquotedStringContext context);
+	/// <summary>
+	/// Exit a parse tree produced by the <c>UnquotedString</c>
+	/// labeled alternative in <see cref="CommandParser.str"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	void ExitUnquotedString([NotNull] CommandParser.UnquotedStringContext context);
+	/// <summary>
+	/// Enter a parse tree produced by the <c>SingleQuotedString</c>
+	/// labeled alternative in <see cref="CommandParser.str"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	void EnterSingleQuotedString([NotNull] CommandParser.SingleQuotedStringContext context);
+	/// <summary>
+	/// Exit a parse tree produced by the <c>SingleQuotedString</c>
+	/// labeled alternative in <see cref="CommandParser.str"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	void ExitSingleQuotedString([NotNull] CommandParser.SingleQuotedStringContext context);
+	/// <summary>
+	/// Enter a parse tree produced by the <c>DoubleQuotedString</c>
+	/// labeled alternative in <see cref="CommandParser.str"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	void EnterDoubleQuotedString([NotNull] CommandParser.DoubleQuotedStringContext context);
+	/// <summary>
+	/// Exit a parse tree produced by the <c>DoubleQuotedString</c>
+	/// labeled alternative in <see cref="CommandParser.str"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	void ExitDoubleQuotedString([NotNull] CommandParser.DoubleQuotedStringContext context);
+	/// <summary>
+	/// Enter a parse tree produced by the <c>SingleStringText</c>
+	/// labeled alternative in <see cref="CommandParser.sstr_inner"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	void EnterSingleStringText([NotNull] CommandParser.SingleStringTextContext context);
+	/// <summary>
+	/// Exit a parse tree produced by the <c>SingleStringText</c>
+	/// labeled alternative in <see cref="CommandParser.sstr_inner"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	void ExitSingleStringText([NotNull] CommandParser.SingleStringTextContext context);
+	/// <summary>
+	/// Enter a parse tree produced by the <c>DoubleStringEscapeCharacter</c>
+	/// labeled alternative in <see cref="CommandParser.dstr_inner"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	void EnterDoubleStringEscapeCharacter([NotNull] CommandParser.DoubleStringEscapeCharacterContext context);
+	/// <summary>
+	/// Exit a parse tree produced by the <c>DoubleStringEscapeCharacter</c>
+	/// labeled alternative in <see cref="CommandParser.dstr_inner"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	void ExitDoubleStringEscapeCharacter([NotNull] CommandParser.DoubleStringEscapeCharacterContext context);
+	/// <summary>
+	/// Enter a parse tree produced by the <c>DoubleStringText</c>
+	/// labeled alternative in <see cref="CommandParser.dstr_inner"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	void EnterDoubleStringText([NotNull] CommandParser.DoubleStringTextContext context);
+	/// <summary>
+	/// Exit a parse tree produced by the <c>DoubleStringText</c>
+	/// labeled alternative in <see cref="CommandParser.dstr_inner"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	void ExitDoubleStringText([NotNull] CommandParser.DoubleStringTextContext context);
 }
 } // namespace CodeCrafters.Shell.ArgParsing

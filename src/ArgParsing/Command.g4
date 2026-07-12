@@ -1,12 +1,20 @@
 ﻿grammar Command;
 
-cmd : arg (WS arg)* EOF ;
-arg : (UNQUOTED | SSTRING | DSTRING | D_SQUOTE | D_DQUOTE | ESCAPE)+ ;
+cmd        : arg (WS+ arg)* EOF ;
+arg        : str+ ;
+str        : SLASH .                         #EscapeCharacter
+           | NON_WS+                         #UnquotedString
+           | SQUOTE (sstr_inner)* SQUOTE     #SingleQuotedString
+           | DQUOTE (dstr_inner)* DQUOTE     #DoubleQuotedString
+           ;
+sstr_inner : (NON_WS | WS | DQUOTE | SLASH)+ #SingleStringText
+           ;
+dstr_inner : SLASH .                         #DoubleStringEscapeCharacter
+           | (NON_WS | WS | SQUOTE)+         #DoubleStringText
+           ;
 
-ESCAPE   : '\\' . ;
-SSTRING  : '\'' ('\\\'' | (~[']))+ '\'' ;
-DSTRING  : '"' ('\\"' | (~[\\"]))+ '"' ;
-UNQUOTED : (~[ \\\t\r\n'"])+ ;
-D_SQUOTE : '\'\'' ;
-D_DQUOTE : '""' ;
-WS       : [ \t\r\n]+ ;
+WS : [ \t\r\n] ;
+SQUOTE : '\'' ;
+DQUOTE : '"' ;
+SLASH : '\\' ;
+NON_WS : (~[ \t\r\n]) ;

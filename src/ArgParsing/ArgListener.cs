@@ -6,29 +6,29 @@ namespace CodeCrafters.Shell.ArgParsing;
 internal class ArgListener : CommandBaseListener
 {
     private readonly List<string> _args = [];
+    private readonly StringBuilder _currentArg = new();
     
     public string[] Args => _args.ToArray();
     
-    public override void EnterArg(CommandParser.ArgContext context)
-    {
-        _args.Add(string.Join(string.Empty, context
-            .UNQUOTED()
-            .Union(context.SSTRING())
-            .Union(context.DSTRING())
-            .Union(context.ESCAPE())
-            .OrderBy(token => token.Symbol.TokenIndex)
-            .Select<ITerminalNode, string>(token => token.Symbol.Type switch
-            {
-                CommandParser.UNQUOTED => token.GetText(),
-                CommandParser.SSTRING or CommandParser.DSTRING => UnwrapQuotedString(token.GetText()),
-                CommandParser.ESCAPE => Unescape(token.GetText()),
-                _ => string.Empty
-            })));
-    }
-    
-    private static string UnwrapQuotedString(string s) => s.Length >= 2
-        ? s.Substring(1, s.Length - 2)
-        : s;
+    public override void EnterArg(CommandParser.ArgContext context) => _currentArg.Clear();
+
+    public override void ExitEscapeCharacter(CommandParser.EscapeCharacterContext context) =>
+        _currentArg.Append(Unescape(context.GetText()));
+
+    public override void ExitUnquotedString(CommandParser.UnquotedStringContext context) =>
+        _currentArg.Append(context.GetText());
+
+    public override void ExitSingleStringText(CommandParser.SingleStringTextContext context) =>
+        _currentArg.Append(context.GetText());
+
+    public override void ExitDoubleStringEscapeCharacter(CommandParser.DoubleStringEscapeCharacterContext context) =>
+        _currentArg.Append(Unescape(context.GetText()));
+
+    public override void ExitDoubleStringText(CommandParser.DoubleStringTextContext context) =>
+        _currentArg.Append(context.GetText());
+
+    public override void ExitArg(CommandParser.ArgContext context) =>
+        _args.Add(_currentArg.ToString());
     
     private static string Unescape(string s) => s.Length > 1 ? s[1..] : s;
 }

@@ -37,19 +37,18 @@ public partial class CommandParser : Parser {
 	protected static DFA[] decisionToDFA;
 	protected static PredictionContextCache sharedContextCache = new PredictionContextCache();
 	public const int
-		ESCAPE=1, SSTRING=2, DSTRING=3, UNQUOTED=4, D_SQUOTE=5, D_DQUOTE=6, WS=7;
+		WS=1, SQUOTE=2, DQUOTE=3, SLASH=4, NON_WS=5;
 	public const int
-		RULE_cmd = 0, RULE_arg = 1;
+		RULE_cmd = 0, RULE_arg = 1, RULE_str = 2, RULE_sstr_inner = 3, RULE_dstr_inner = 4;
 	public static readonly string[] ruleNames = {
-		"cmd", "arg"
+		"cmd", "arg", "str", "sstr_inner", "dstr_inner"
 	};
 
 	private static readonly string[] _LiteralNames = {
-		null, null, null, null, null, "''''", "'\"\"'"
+		null, null, "'''", "'\"'", "'\\'"
 	};
 	private static readonly string[] _SymbolicNames = {
-		null, "ESCAPE", "SSTRING", "DSTRING", "UNQUOTED", "D_SQUOTE", "D_DQUOTE", 
-		"WS"
+		null, "WS", "SQUOTE", "DQUOTE", "SLASH", "NON_WS"
 	};
 	public static readonly IVocabulary DefaultVocabulary = new Vocabulary(_LiteralNames, _SymbolicNames);
 
@@ -126,25 +125,37 @@ public partial class CommandParser : Parser {
 		try {
 			EnterOuterAlt(_localctx, 1);
 			{
-			State = 4;
+			State = 10;
 			arg();
-			State = 9;
+			State = 19;
 			ErrorHandler.Sync(this);
 			_la = TokenStream.LA(1);
 			while (_la==WS) {
 				{
 				{
-				State = 5;
-				Match(WS);
-				State = 6;
+				State = 12;
+				ErrorHandler.Sync(this);
+				_la = TokenStream.LA(1);
+				do {
+					{
+					{
+					State = 11;
+					Match(WS);
+					}
+					}
+					State = 14;
+					ErrorHandler.Sync(this);
+					_la = TokenStream.LA(1);
+				} while ( _la==WS );
+				State = 16;
 				arg();
 				}
 				}
-				State = 11;
+				State = 21;
 				ErrorHandler.Sync(this);
 				_la = TokenStream.LA(1);
 			}
-			State = 12;
+			State = 22;
 			Match(Eof);
 			}
 		}
@@ -160,29 +171,11 @@ public partial class CommandParser : Parser {
 	}
 
 	public partial class ArgContext : ParserRuleContext {
-		[System.Diagnostics.DebuggerNonUserCode] public ITerminalNode[] UNQUOTED() { return GetTokens(CommandParser.UNQUOTED); }
-		[System.Diagnostics.DebuggerNonUserCode] public ITerminalNode UNQUOTED(int i) {
-			return GetToken(CommandParser.UNQUOTED, i);
+		[System.Diagnostics.DebuggerNonUserCode] public StrContext[] str() {
+			return GetRuleContexts<StrContext>();
 		}
-		[System.Diagnostics.DebuggerNonUserCode] public ITerminalNode[] SSTRING() { return GetTokens(CommandParser.SSTRING); }
-		[System.Diagnostics.DebuggerNonUserCode] public ITerminalNode SSTRING(int i) {
-			return GetToken(CommandParser.SSTRING, i);
-		}
-		[System.Diagnostics.DebuggerNonUserCode] public ITerminalNode[] DSTRING() { return GetTokens(CommandParser.DSTRING); }
-		[System.Diagnostics.DebuggerNonUserCode] public ITerminalNode DSTRING(int i) {
-			return GetToken(CommandParser.DSTRING, i);
-		}
-		[System.Diagnostics.DebuggerNonUserCode] public ITerminalNode[] D_SQUOTE() { return GetTokens(CommandParser.D_SQUOTE); }
-		[System.Diagnostics.DebuggerNonUserCode] public ITerminalNode D_SQUOTE(int i) {
-			return GetToken(CommandParser.D_SQUOTE, i);
-		}
-		[System.Diagnostics.DebuggerNonUserCode] public ITerminalNode[] D_DQUOTE() { return GetTokens(CommandParser.D_DQUOTE); }
-		[System.Diagnostics.DebuggerNonUserCode] public ITerminalNode D_DQUOTE(int i) {
-			return GetToken(CommandParser.D_DQUOTE, i);
-		}
-		[System.Diagnostics.DebuggerNonUserCode] public ITerminalNode[] ESCAPE() { return GetTokens(CommandParser.ESCAPE); }
-		[System.Diagnostics.DebuggerNonUserCode] public ITerminalNode ESCAPE(int i) {
-			return GetToken(CommandParser.ESCAPE, i);
+		[System.Diagnostics.DebuggerNonUserCode] public StrContext str(int i) {
+			return GetRuleContext<StrContext>(i);
 		}
 		public ArgContext(ParserRuleContext parent, int invokingState)
 			: base(parent, invokingState)
@@ -215,27 +208,475 @@ public partial class CommandParser : Parser {
 		try {
 			EnterOuterAlt(_localctx, 1);
 			{
-			State = 15;
+			State = 25;
 			ErrorHandler.Sync(this);
 			_la = TokenStream.LA(1);
 			do {
 				{
 				{
-				State = 14;
-				_la = TokenStream.LA(1);
-				if ( !((((_la) & ~0x3f) == 0 && ((1L << _la) & 126L) != 0)) ) {
-				ErrorHandler.RecoverInline(this);
-				}
-				else {
-					ErrorHandler.ReportMatch(this);
-				    Consume();
+				State = 24;
+				str();
 				}
 				}
-				}
-				State = 17;
+				State = 27;
 				ErrorHandler.Sync(this);
 				_la = TokenStream.LA(1);
-			} while ( (((_la) & ~0x3f) == 0 && ((1L << _la) & 126L) != 0) );
+			} while ( (((_la) & ~0x3f) == 0 && ((1L << _la) & 60L) != 0) );
+			}
+		}
+		catch (RecognitionException re) {
+			_localctx.exception = re;
+			ErrorHandler.ReportError(this, re);
+			ErrorHandler.Recover(this, re);
+		}
+		finally {
+			ExitRule();
+		}
+		return _localctx;
+	}
+
+	public partial class StrContext : ParserRuleContext {
+		public StrContext(ParserRuleContext parent, int invokingState)
+			: base(parent, invokingState)
+		{
+		}
+		public override int RuleIndex { get { return RULE_str; } }
+	 
+		public StrContext() { }
+		public virtual void CopyFrom(StrContext context) {
+			base.CopyFrom(context);
+		}
+	}
+	public partial class DoubleQuotedStringContext : StrContext {
+		[System.Diagnostics.DebuggerNonUserCode] public ITerminalNode[] DQUOTE() { return GetTokens(CommandParser.DQUOTE); }
+		[System.Diagnostics.DebuggerNonUserCode] public ITerminalNode DQUOTE(int i) {
+			return GetToken(CommandParser.DQUOTE, i);
+		}
+		[System.Diagnostics.DebuggerNonUserCode] public Dstr_innerContext[] dstr_inner() {
+			return GetRuleContexts<Dstr_innerContext>();
+		}
+		[System.Diagnostics.DebuggerNonUserCode] public Dstr_innerContext dstr_inner(int i) {
+			return GetRuleContext<Dstr_innerContext>(i);
+		}
+		public DoubleQuotedStringContext(StrContext context) { CopyFrom(context); }
+		[System.Diagnostics.DebuggerNonUserCode]
+		public override void EnterRule(IParseTreeListener listener) {
+			ICommandListener typedListener = listener as ICommandListener;
+			if (typedListener != null) typedListener.EnterDoubleQuotedString(this);
+		}
+		[System.Diagnostics.DebuggerNonUserCode]
+		public override void ExitRule(IParseTreeListener listener) {
+			ICommandListener typedListener = listener as ICommandListener;
+			if (typedListener != null) typedListener.ExitDoubleQuotedString(this);
+		}
+		[System.Diagnostics.DebuggerNonUserCode]
+		public override TResult Accept<TResult>(IParseTreeVisitor<TResult> visitor) {
+			ICommandVisitor<TResult> typedVisitor = visitor as ICommandVisitor<TResult>;
+			if (typedVisitor != null) return typedVisitor.VisitDoubleQuotedString(this);
+			else return visitor.VisitChildren(this);
+		}
+	}
+	public partial class SingleQuotedStringContext : StrContext {
+		[System.Diagnostics.DebuggerNonUserCode] public ITerminalNode[] SQUOTE() { return GetTokens(CommandParser.SQUOTE); }
+		[System.Diagnostics.DebuggerNonUserCode] public ITerminalNode SQUOTE(int i) {
+			return GetToken(CommandParser.SQUOTE, i);
+		}
+		[System.Diagnostics.DebuggerNonUserCode] public Sstr_innerContext[] sstr_inner() {
+			return GetRuleContexts<Sstr_innerContext>();
+		}
+		[System.Diagnostics.DebuggerNonUserCode] public Sstr_innerContext sstr_inner(int i) {
+			return GetRuleContext<Sstr_innerContext>(i);
+		}
+		public SingleQuotedStringContext(StrContext context) { CopyFrom(context); }
+		[System.Diagnostics.DebuggerNonUserCode]
+		public override void EnterRule(IParseTreeListener listener) {
+			ICommandListener typedListener = listener as ICommandListener;
+			if (typedListener != null) typedListener.EnterSingleQuotedString(this);
+		}
+		[System.Diagnostics.DebuggerNonUserCode]
+		public override void ExitRule(IParseTreeListener listener) {
+			ICommandListener typedListener = listener as ICommandListener;
+			if (typedListener != null) typedListener.ExitSingleQuotedString(this);
+		}
+		[System.Diagnostics.DebuggerNonUserCode]
+		public override TResult Accept<TResult>(IParseTreeVisitor<TResult> visitor) {
+			ICommandVisitor<TResult> typedVisitor = visitor as ICommandVisitor<TResult>;
+			if (typedVisitor != null) return typedVisitor.VisitSingleQuotedString(this);
+			else return visitor.VisitChildren(this);
+		}
+	}
+	public partial class UnquotedStringContext : StrContext {
+		[System.Diagnostics.DebuggerNonUserCode] public ITerminalNode[] NON_WS() { return GetTokens(CommandParser.NON_WS); }
+		[System.Diagnostics.DebuggerNonUserCode] public ITerminalNode NON_WS(int i) {
+			return GetToken(CommandParser.NON_WS, i);
+		}
+		public UnquotedStringContext(StrContext context) { CopyFrom(context); }
+		[System.Diagnostics.DebuggerNonUserCode]
+		public override void EnterRule(IParseTreeListener listener) {
+			ICommandListener typedListener = listener as ICommandListener;
+			if (typedListener != null) typedListener.EnterUnquotedString(this);
+		}
+		[System.Diagnostics.DebuggerNonUserCode]
+		public override void ExitRule(IParseTreeListener listener) {
+			ICommandListener typedListener = listener as ICommandListener;
+			if (typedListener != null) typedListener.ExitUnquotedString(this);
+		}
+		[System.Diagnostics.DebuggerNonUserCode]
+		public override TResult Accept<TResult>(IParseTreeVisitor<TResult> visitor) {
+			ICommandVisitor<TResult> typedVisitor = visitor as ICommandVisitor<TResult>;
+			if (typedVisitor != null) return typedVisitor.VisitUnquotedString(this);
+			else return visitor.VisitChildren(this);
+		}
+	}
+	public partial class EscapeCharacterContext : StrContext {
+		[System.Diagnostics.DebuggerNonUserCode] public ITerminalNode SLASH() { return GetToken(CommandParser.SLASH, 0); }
+		public EscapeCharacterContext(StrContext context) { CopyFrom(context); }
+		[System.Diagnostics.DebuggerNonUserCode]
+		public override void EnterRule(IParseTreeListener listener) {
+			ICommandListener typedListener = listener as ICommandListener;
+			if (typedListener != null) typedListener.EnterEscapeCharacter(this);
+		}
+		[System.Diagnostics.DebuggerNonUserCode]
+		public override void ExitRule(IParseTreeListener listener) {
+			ICommandListener typedListener = listener as ICommandListener;
+			if (typedListener != null) typedListener.ExitEscapeCharacter(this);
+		}
+		[System.Diagnostics.DebuggerNonUserCode]
+		public override TResult Accept<TResult>(IParseTreeVisitor<TResult> visitor) {
+			ICommandVisitor<TResult> typedVisitor = visitor as ICommandVisitor<TResult>;
+			if (typedVisitor != null) return typedVisitor.VisitEscapeCharacter(this);
+			else return visitor.VisitChildren(this);
+		}
+	}
+
+	[RuleVersion(0)]
+	public StrContext str() {
+		StrContext _localctx = new StrContext(Context, State);
+		EnterRule(_localctx, 4, RULE_str);
+		int _la;
+		try {
+			int _alt;
+			State = 52;
+			ErrorHandler.Sync(this);
+			switch (TokenStream.LA(1)) {
+			case SLASH:
+				_localctx = new EscapeCharacterContext(_localctx);
+				EnterOuterAlt(_localctx, 1);
+				{
+				State = 29;
+				Match(SLASH);
+				State = 30;
+				MatchWildcard();
+				}
+				break;
+			case NON_WS:
+				_localctx = new UnquotedStringContext(_localctx);
+				EnterOuterAlt(_localctx, 2);
+				{
+				State = 32;
+				ErrorHandler.Sync(this);
+				_alt = 1;
+				do {
+					switch (_alt) {
+					case 1:
+						{
+						{
+						State = 31;
+						Match(NON_WS);
+						}
+						}
+						break;
+					default:
+						throw new NoViableAltException(this);
+					}
+					State = 34;
+					ErrorHandler.Sync(this);
+					_alt = Interpreter.AdaptivePredict(TokenStream,3,Context);
+				} while ( _alt!=2 && _alt!=global::Antlr4.Runtime.Atn.ATN.INVALID_ALT_NUMBER );
+				}
+				break;
+			case SQUOTE:
+				_localctx = new SingleQuotedStringContext(_localctx);
+				EnterOuterAlt(_localctx, 3);
+				{
+				State = 36;
+				Match(SQUOTE);
+				State = 40;
+				ErrorHandler.Sync(this);
+				_la = TokenStream.LA(1);
+				while ((((_la) & ~0x3f) == 0 && ((1L << _la) & 58L) != 0)) {
+					{
+					{
+					State = 37;
+					sstr_inner();
+					}
+					}
+					State = 42;
+					ErrorHandler.Sync(this);
+					_la = TokenStream.LA(1);
+				}
+				State = 43;
+				Match(SQUOTE);
+				}
+				break;
+			case DQUOTE:
+				_localctx = new DoubleQuotedStringContext(_localctx);
+				EnterOuterAlt(_localctx, 4);
+				{
+				State = 44;
+				Match(DQUOTE);
+				State = 48;
+				ErrorHandler.Sync(this);
+				_la = TokenStream.LA(1);
+				while ((((_la) & ~0x3f) == 0 && ((1L << _la) & 54L) != 0)) {
+					{
+					{
+					State = 45;
+					dstr_inner();
+					}
+					}
+					State = 50;
+					ErrorHandler.Sync(this);
+					_la = TokenStream.LA(1);
+				}
+				State = 51;
+				Match(DQUOTE);
+				}
+				break;
+			default:
+				throw new NoViableAltException(this);
+			}
+		}
+		catch (RecognitionException re) {
+			_localctx.exception = re;
+			ErrorHandler.ReportError(this, re);
+			ErrorHandler.Recover(this, re);
+		}
+		finally {
+			ExitRule();
+		}
+		return _localctx;
+	}
+
+	public partial class Sstr_innerContext : ParserRuleContext {
+		public Sstr_innerContext(ParserRuleContext parent, int invokingState)
+			: base(parent, invokingState)
+		{
+		}
+		public override int RuleIndex { get { return RULE_sstr_inner; } }
+	 
+		public Sstr_innerContext() { }
+		public virtual void CopyFrom(Sstr_innerContext context) {
+			base.CopyFrom(context);
+		}
+	}
+	public partial class SingleStringTextContext : Sstr_innerContext {
+		[System.Diagnostics.DebuggerNonUserCode] public ITerminalNode[] NON_WS() { return GetTokens(CommandParser.NON_WS); }
+		[System.Diagnostics.DebuggerNonUserCode] public ITerminalNode NON_WS(int i) {
+			return GetToken(CommandParser.NON_WS, i);
+		}
+		[System.Diagnostics.DebuggerNonUserCode] public ITerminalNode[] WS() { return GetTokens(CommandParser.WS); }
+		[System.Diagnostics.DebuggerNonUserCode] public ITerminalNode WS(int i) {
+			return GetToken(CommandParser.WS, i);
+		}
+		[System.Diagnostics.DebuggerNonUserCode] public ITerminalNode[] DQUOTE() { return GetTokens(CommandParser.DQUOTE); }
+		[System.Diagnostics.DebuggerNonUserCode] public ITerminalNode DQUOTE(int i) {
+			return GetToken(CommandParser.DQUOTE, i);
+		}
+		[System.Diagnostics.DebuggerNonUserCode] public ITerminalNode[] SLASH() { return GetTokens(CommandParser.SLASH); }
+		[System.Diagnostics.DebuggerNonUserCode] public ITerminalNode SLASH(int i) {
+			return GetToken(CommandParser.SLASH, i);
+		}
+		public SingleStringTextContext(Sstr_innerContext context) { CopyFrom(context); }
+		[System.Diagnostics.DebuggerNonUserCode]
+		public override void EnterRule(IParseTreeListener listener) {
+			ICommandListener typedListener = listener as ICommandListener;
+			if (typedListener != null) typedListener.EnterSingleStringText(this);
+		}
+		[System.Diagnostics.DebuggerNonUserCode]
+		public override void ExitRule(IParseTreeListener listener) {
+			ICommandListener typedListener = listener as ICommandListener;
+			if (typedListener != null) typedListener.ExitSingleStringText(this);
+		}
+		[System.Diagnostics.DebuggerNonUserCode]
+		public override TResult Accept<TResult>(IParseTreeVisitor<TResult> visitor) {
+			ICommandVisitor<TResult> typedVisitor = visitor as ICommandVisitor<TResult>;
+			if (typedVisitor != null) return typedVisitor.VisitSingleStringText(this);
+			else return visitor.VisitChildren(this);
+		}
+	}
+
+	[RuleVersion(0)]
+	public Sstr_innerContext sstr_inner() {
+		Sstr_innerContext _localctx = new Sstr_innerContext(Context, State);
+		EnterRule(_localctx, 6, RULE_sstr_inner);
+		int _la;
+		try {
+			int _alt;
+			_localctx = new SingleStringTextContext(_localctx);
+			EnterOuterAlt(_localctx, 1);
+			{
+			State = 55;
+			ErrorHandler.Sync(this);
+			_alt = 1;
+			do {
+				switch (_alt) {
+				case 1:
+					{
+					{
+					State = 54;
+					_la = TokenStream.LA(1);
+					if ( !((((_la) & ~0x3f) == 0 && ((1L << _la) & 58L) != 0)) ) {
+					ErrorHandler.RecoverInline(this);
+					}
+					else {
+						ErrorHandler.ReportMatch(this);
+					    Consume();
+					}
+					}
+					}
+					break;
+				default:
+					throw new NoViableAltException(this);
+				}
+				State = 57;
+				ErrorHandler.Sync(this);
+				_alt = Interpreter.AdaptivePredict(TokenStream,7,Context);
+			} while ( _alt!=2 && _alt!=global::Antlr4.Runtime.Atn.ATN.INVALID_ALT_NUMBER );
+			}
+		}
+		catch (RecognitionException re) {
+			_localctx.exception = re;
+			ErrorHandler.ReportError(this, re);
+			ErrorHandler.Recover(this, re);
+		}
+		finally {
+			ExitRule();
+		}
+		return _localctx;
+	}
+
+	public partial class Dstr_innerContext : ParserRuleContext {
+		public Dstr_innerContext(ParserRuleContext parent, int invokingState)
+			: base(parent, invokingState)
+		{
+		}
+		public override int RuleIndex { get { return RULE_dstr_inner; } }
+	 
+		public Dstr_innerContext() { }
+		public virtual void CopyFrom(Dstr_innerContext context) {
+			base.CopyFrom(context);
+		}
+	}
+	public partial class DoubleStringEscapeCharacterContext : Dstr_innerContext {
+		[System.Diagnostics.DebuggerNonUserCode] public ITerminalNode SLASH() { return GetToken(CommandParser.SLASH, 0); }
+		public DoubleStringEscapeCharacterContext(Dstr_innerContext context) { CopyFrom(context); }
+		[System.Diagnostics.DebuggerNonUserCode]
+		public override void EnterRule(IParseTreeListener listener) {
+			ICommandListener typedListener = listener as ICommandListener;
+			if (typedListener != null) typedListener.EnterDoubleStringEscapeCharacter(this);
+		}
+		[System.Diagnostics.DebuggerNonUserCode]
+		public override void ExitRule(IParseTreeListener listener) {
+			ICommandListener typedListener = listener as ICommandListener;
+			if (typedListener != null) typedListener.ExitDoubleStringEscapeCharacter(this);
+		}
+		[System.Diagnostics.DebuggerNonUserCode]
+		public override TResult Accept<TResult>(IParseTreeVisitor<TResult> visitor) {
+			ICommandVisitor<TResult> typedVisitor = visitor as ICommandVisitor<TResult>;
+			if (typedVisitor != null) return typedVisitor.VisitDoubleStringEscapeCharacter(this);
+			else return visitor.VisitChildren(this);
+		}
+	}
+	public partial class DoubleStringTextContext : Dstr_innerContext {
+		[System.Diagnostics.DebuggerNonUserCode] public ITerminalNode[] NON_WS() { return GetTokens(CommandParser.NON_WS); }
+		[System.Diagnostics.DebuggerNonUserCode] public ITerminalNode NON_WS(int i) {
+			return GetToken(CommandParser.NON_WS, i);
+		}
+		[System.Diagnostics.DebuggerNonUserCode] public ITerminalNode[] WS() { return GetTokens(CommandParser.WS); }
+		[System.Diagnostics.DebuggerNonUserCode] public ITerminalNode WS(int i) {
+			return GetToken(CommandParser.WS, i);
+		}
+		[System.Diagnostics.DebuggerNonUserCode] public ITerminalNode[] SQUOTE() { return GetTokens(CommandParser.SQUOTE); }
+		[System.Diagnostics.DebuggerNonUserCode] public ITerminalNode SQUOTE(int i) {
+			return GetToken(CommandParser.SQUOTE, i);
+		}
+		public DoubleStringTextContext(Dstr_innerContext context) { CopyFrom(context); }
+		[System.Diagnostics.DebuggerNonUserCode]
+		public override void EnterRule(IParseTreeListener listener) {
+			ICommandListener typedListener = listener as ICommandListener;
+			if (typedListener != null) typedListener.EnterDoubleStringText(this);
+		}
+		[System.Diagnostics.DebuggerNonUserCode]
+		public override void ExitRule(IParseTreeListener listener) {
+			ICommandListener typedListener = listener as ICommandListener;
+			if (typedListener != null) typedListener.ExitDoubleStringText(this);
+		}
+		[System.Diagnostics.DebuggerNonUserCode]
+		public override TResult Accept<TResult>(IParseTreeVisitor<TResult> visitor) {
+			ICommandVisitor<TResult> typedVisitor = visitor as ICommandVisitor<TResult>;
+			if (typedVisitor != null) return typedVisitor.VisitDoubleStringText(this);
+			else return visitor.VisitChildren(this);
+		}
+	}
+
+	[RuleVersion(0)]
+	public Dstr_innerContext dstr_inner() {
+		Dstr_innerContext _localctx = new Dstr_innerContext(Context, State);
+		EnterRule(_localctx, 8, RULE_dstr_inner);
+		int _la;
+		try {
+			int _alt;
+			State = 66;
+			ErrorHandler.Sync(this);
+			switch (TokenStream.LA(1)) {
+			case SLASH:
+				_localctx = new DoubleStringEscapeCharacterContext(_localctx);
+				EnterOuterAlt(_localctx, 1);
+				{
+				State = 59;
+				Match(SLASH);
+				State = 60;
+				MatchWildcard();
+				}
+				break;
+			case WS:
+			case SQUOTE:
+			case NON_WS:
+				_localctx = new DoubleStringTextContext(_localctx);
+				EnterOuterAlt(_localctx, 2);
+				{
+				State = 62;
+				ErrorHandler.Sync(this);
+				_alt = 1;
+				do {
+					switch (_alt) {
+					case 1:
+						{
+						{
+						State = 61;
+						_la = TokenStream.LA(1);
+						if ( !((((_la) & ~0x3f) == 0 && ((1L << _la) & 38L) != 0)) ) {
+						ErrorHandler.RecoverInline(this);
+						}
+						else {
+							ErrorHandler.ReportMatch(this);
+						    Consume();
+						}
+						}
+						}
+						break;
+					default:
+						throw new NoViableAltException(this);
+					}
+					State = 64;
+					ErrorHandler.Sync(this);
+					_alt = Interpreter.AdaptivePredict(TokenStream,8,Context);
+				} while ( _alt!=2 && _alt!=global::Antlr4.Runtime.Atn.ATN.INVALID_ALT_NUMBER );
+				}
+				break;
+			default:
+				throw new NoViableAltException(this);
 			}
 		}
 		catch (RecognitionException re) {
@@ -250,12 +691,27 @@ public partial class CommandParser : Parser {
 	}
 
 	private static int[] _serializedATN = {
-		4,1,7,20,2,0,7,0,2,1,7,1,1,0,1,0,1,0,5,0,8,8,0,10,0,12,0,11,9,0,1,0,1,
-		0,1,1,4,1,16,8,1,11,1,12,1,17,1,1,0,0,2,0,2,0,1,1,0,1,6,19,0,4,1,0,0,0,
-		2,15,1,0,0,0,4,9,3,2,1,0,5,6,5,7,0,0,6,8,3,2,1,0,7,5,1,0,0,0,8,11,1,0,
-		0,0,9,7,1,0,0,0,9,10,1,0,0,0,10,12,1,0,0,0,11,9,1,0,0,0,12,13,5,0,0,1,
-		13,1,1,0,0,0,14,16,7,0,0,0,15,14,1,0,0,0,16,17,1,0,0,0,17,15,1,0,0,0,17,
-		18,1,0,0,0,18,3,1,0,0,0,2,9,17
+		4,1,5,69,2,0,7,0,2,1,7,1,2,2,7,2,2,3,7,3,2,4,7,4,1,0,1,0,4,0,13,8,0,11,
+		0,12,0,14,1,0,5,0,18,8,0,10,0,12,0,21,9,0,1,0,1,0,1,1,4,1,26,8,1,11,1,
+		12,1,27,1,2,1,2,1,2,4,2,33,8,2,11,2,12,2,34,1,2,1,2,5,2,39,8,2,10,2,12,
+		2,42,9,2,1,2,1,2,1,2,5,2,47,8,2,10,2,12,2,50,9,2,1,2,3,2,53,8,2,1,3,4,
+		3,56,8,3,11,3,12,3,57,1,4,1,4,1,4,4,4,63,8,4,11,4,12,4,64,3,4,67,8,4,1,
+		4,0,0,5,0,2,4,6,8,0,2,2,0,1,1,3,5,2,0,1,2,5,5,75,0,10,1,0,0,0,2,25,1,0,
+		0,0,4,52,1,0,0,0,6,55,1,0,0,0,8,66,1,0,0,0,10,19,3,2,1,0,11,13,5,1,0,0,
+		12,11,1,0,0,0,13,14,1,0,0,0,14,12,1,0,0,0,14,15,1,0,0,0,15,16,1,0,0,0,
+		16,18,3,2,1,0,17,12,1,0,0,0,18,21,1,0,0,0,19,17,1,0,0,0,19,20,1,0,0,0,
+		20,22,1,0,0,0,21,19,1,0,0,0,22,23,5,0,0,1,23,1,1,0,0,0,24,26,3,4,2,0,25,
+		24,1,0,0,0,26,27,1,0,0,0,27,25,1,0,0,0,27,28,1,0,0,0,28,3,1,0,0,0,29,30,
+		5,4,0,0,30,53,9,0,0,0,31,33,5,5,0,0,32,31,1,0,0,0,33,34,1,0,0,0,34,32,
+		1,0,0,0,34,35,1,0,0,0,35,53,1,0,0,0,36,40,5,2,0,0,37,39,3,6,3,0,38,37,
+		1,0,0,0,39,42,1,0,0,0,40,38,1,0,0,0,40,41,1,0,0,0,41,43,1,0,0,0,42,40,
+		1,0,0,0,43,53,5,2,0,0,44,48,5,3,0,0,45,47,3,8,4,0,46,45,1,0,0,0,47,50,
+		1,0,0,0,48,46,1,0,0,0,48,49,1,0,0,0,49,51,1,0,0,0,50,48,1,0,0,0,51,53,
+		5,3,0,0,52,29,1,0,0,0,52,32,1,0,0,0,52,36,1,0,0,0,52,44,1,0,0,0,53,5,1,
+		0,0,0,54,56,7,0,0,0,55,54,1,0,0,0,56,57,1,0,0,0,57,55,1,0,0,0,57,58,1,
+		0,0,0,58,7,1,0,0,0,59,60,5,4,0,0,60,67,9,0,0,0,61,63,7,1,0,0,62,61,1,0,
+		0,0,63,64,1,0,0,0,64,62,1,0,0,0,64,65,1,0,0,0,65,67,1,0,0,0,66,59,1,0,
+		0,0,66,62,1,0,0,0,67,9,1,0,0,0,10,14,19,27,34,40,48,52,57,64,66
 	};
 
 	public static readonly ATN _ATN =

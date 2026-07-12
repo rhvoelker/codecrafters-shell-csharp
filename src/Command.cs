@@ -54,7 +54,7 @@ internal class ExternalCommand(string path) : Command
         process.StartInfo.WorkingDirectory = System.IO.Path.GetDirectoryName(Path);
         process.StartInfo.FileName = System.IO.Path.GetFileName(Path);
         process.StartInfo.Arguments = args.Length > 1
-            ? string.Join(' ', args[1..].Select(QuoteArg))
+            ? string.Join(' ', args[1..].Select(QuoteAndEscapeDoubleQuotes))
             : string.Empty;
         process.StartInfo.UseShellExecute = false;
         process.StartInfo.RedirectStandardOutput = true;
@@ -72,9 +72,9 @@ internal class ExternalCommand(string path) : Command
         return CommandResult.Continue;
     }
 
-    private static string QuoteArg(string arg) => arg.EndsWith('\\')
-        ? $"\"{arg}\\\""
-        : $"\"{arg}\"";
+    private static string QuoteAndEscapeDoubleQuotes(string s) => s.EndsWith('\\')
+        ? $"\"{s.Replace("\"", "\\\"")}\\\""
+        : $"\"{s.Replace("\"", "\\\"")}\"";
 }
 
 internal class NotFoundCommand(string name) : Command
