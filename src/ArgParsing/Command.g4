@@ -1,9 +1,10 @@
 ﻿grammar Command;
 
-cmd        : arg (WS+ arg)* (WS+ red)? EOF ;
+cmd        : arg (WS+ arg)* (WS+ red)* EOF ;
 arg        : str+ ;
-red        : red_stream? REDIRECT WS* arg ;
+red        : red_stream? red_op WS* arg ;
 red_stream : NUMBER+ ;
+red_op     : REDIRECT REDIRECT? ;
 str        : SLASH .                                             #EscapeCharacter
            | (NON_WS | NUMBER)+                                  #UnquotedString
            | SQUOTE (sstr_inner)* SQUOTE                         #SingleQuotedString

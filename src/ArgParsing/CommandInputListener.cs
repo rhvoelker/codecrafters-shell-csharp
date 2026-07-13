@@ -7,12 +7,13 @@ internal class CommandInputListener : CommandBaseListener
     private readonly List<string> _args = [];
     private readonly StringBuilder _currentArg = new();
     private Action _exitArgAction;
+    private FileMode _fileOpenMode;
     
     public string[] Args => _args.ToArray();
     
-    public string? OutputFilePath { get; private set; }
+    public Stream? OutputFileStream { get; private set; }
     
-    public string? ErrorFilePath { get; private set; }
+    public Stream? ErrorFileStream { get; private set; }
 
     public CommandInputListener()
     {
@@ -37,14 +38,18 @@ internal class CommandInputListener : CommandBaseListener
         _currentArg.Append(context.GetText());
 
     public override void ExitArg(CommandParser.ArgContext context) => _exitArgAction.Invoke();
-    
-    public override void EnterRed(CommandParser.RedContext context) => _exitArgAction = SetOutputFilePathToCurrentArg;
+
+    public override void EnterRed(CommandParser.RedContext context)
+    {
+        _exitArgAction = SetOutputFileStreamToCurrentArg;
+        _fileOpenMode = context.red_op().ChildCount == 1 ? FileMode.Create : FileMode.Append;
+    }
 
     public override void ExitRed_stream(CommandParser.Red_streamContext context) =>
         _exitArgAction = context.GetText() switch
         {
-            "1" => SetOutputFilePathToCurrentArg,
-            "2" => SetErrorFilePathToCurrentArg,
+            "1" => SetOutputFileStreamToCurrentArg,
+            "2" => SetErrorFileStreamToCurrentArg,
             { } s => throw new Exception($"{s} is not a known output stream for redirection.")
         };
     
@@ -52,9 +57,32 @@ internal class CommandInputListener : CommandBaseListener
 
     private void AddCurrentArgToArgsList() => _args.Add(_currentArg.ToString());
     
-    private void SetOutputFilePathToCurrentArg() => OutputFilePath = _currentArg.ToString();
-    
-    private void SetErrorFilePathToCurrentArg() => ErrorFilePath = _currentArg.ToString();
+    private void SetOutputFileStreamToCurrentArg()
+    {
+        var path = _currentArg.ToString();
+        CreateParentDirectory(path);
+        
+        OutputFileStream?.Dispose();
+        OutputFileStream = File.Open(path, _fileOpenMode);
+    }
+
+    private void SetErrorFileStreamToCurrentArg()
+    {
+        var path = _currentArg.ToString();
+        CreateParentDirectory(path);
+        
+        ErrorFileStream?.Dispose();
+        ErrorFileStream = File.Open(path, _fileOpenMode);
+    }
+
+    private static void CreateParentDirectory(string path)
+    {
+        var directoryName = Path.GetDirectoryName(path);
+        if (!string.IsNullOrEmpty(directoryName))
+        {
+            Directory.CreateDirectory(directoryName);
+        }
+    }
 
     private static string Unescape(string s) => s.Length > 1 ? s[1..] : s;
 }

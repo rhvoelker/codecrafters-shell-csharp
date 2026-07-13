@@ -85,6 +85,18 @@ public partial class CommandBaseListener : ICommandListener {
 	/// <param name="context">The parse tree.</param>
 	public virtual void ExitRed_stream([NotNull] CommandParser.Red_streamContext context) { }
 	/// <summary>
+	/// Enter a parse tree produced by <see cref="CommandParser.red_op"/>.
+	/// <para>The default implementation does nothing.</para>
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	public virtual void EnterRed_op([NotNull] CommandParser.Red_opContext context) { }
+	/// <summary>
+	/// Exit a parse tree produced by <see cref="CommandParser.red_op"/>.
+	/// <para>The default implementation does nothing.</para>
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	public virtual void ExitRed_op([NotNull] CommandParser.Red_opContext context) { }
+	/// <summary>
 	/// Enter a parse tree produced by the <c>EscapeCharacter</c>
 	/// labeled alternative in <see cref="CommandParser.str"/>.
 	/// <para>The default implementation does nothing.</para>

@@ -15,29 +15,15 @@ internal static class CommandInputEvaluator
         ParseTreeWalker.Default.Walk(listener, parser.cmd());
         
         var outWriter = Console.Out;
-
-        if (listener.OutputFilePath != null)
+        if (listener.OutputFileStream != null)
         {
-            var directoryName = Path.GetDirectoryName(listener.OutputFilePath);
-            if (!string.IsNullOrEmpty(directoryName))
-            {
-                Directory.CreateDirectory(directoryName);
-            }
-            
-            outWriter = new StreamWriter(File.Create(listener.OutputFilePath));
+            outWriter = new StreamWriter(listener.OutputFileStream);
         }
         
         var errorWriter = Console.Error;
-
-        if (listener.ErrorFilePath != null)
+        if (listener.ErrorFileStream != null)
         {
-            var directoryName = Path.GetDirectoryName(listener.ErrorFilePath);
-            if (!string.IsNullOrEmpty(directoryName))
-            {
-                Directory.CreateDirectory(directoryName);
-            }
-            
-            errorWriter = new StreamWriter(File.Create(listener.ErrorFilePath));
+            errorWriter = new StreamWriter(listener.ErrorFileStream);
         }
 
         return new CommandInput(

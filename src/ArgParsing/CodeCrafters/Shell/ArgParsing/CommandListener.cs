@@ -72,6 +72,16 @@ public interface ICommandListener : IParseTreeListener {
 	/// <param name="context">The parse tree.</param>
 	void ExitRed_stream([NotNull] CommandParser.Red_streamContext context);
 	/// <summary>
+	/// Enter a parse tree produced by <see cref="CommandParser.red_op"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	void EnterRed_op([NotNull] CommandParser.Red_opContext context);
+	/// <summary>
+	/// Exit a parse tree produced by <see cref="CommandParser.red_op"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	void ExitRed_op([NotNull] CommandParser.Red_opContext context);
+	/// <summary>
 	/// Enter a parse tree produced by the <c>EscapeCharacter</c>
 	/// labeled alternative in <see cref="CommandParser.str"/>.
 	/// </summary>
