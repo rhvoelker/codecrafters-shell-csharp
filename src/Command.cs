@@ -10,7 +10,7 @@ internal abstract class Command
             ?? GetExternalCommand(name)
             ?? new NotFoundCommand(name);
 
-    public abstract CommandResult Invoke(string[] args);
+    public abstract CommandResult Invoke(CommandInput input);
 
     private static Command? GetBuiltInCommand(string name)
     {
@@ -20,7 +20,8 @@ internal abstract class Command
 
         return func is not null
             ? new BuiltInCommand(
-                (Func<string[], CommandResult>)Delegate.CreateDelegate(typeof(Func<string[], CommandResult>), func))
+                (Func<CommandInput, CommandResult>)
+                    Delegate.CreateDelegate(typeof(Func<CommandInput, CommandResult>), func))
             : null;
     }
 
@@ -39,36 +40,48 @@ internal abstract class Command
     }
 }
 
-internal class BuiltInCommand(Func<string[], CommandResult> func) : Command
+internal class BuiltInCommand(Func<CommandInput, CommandResult> func) : Command
 {
-    public override CommandResult Invoke(string[] args) => func(args);
+    public override CommandResult Invoke(CommandInput input) => func(input);
 }
 
 internal class ExternalCommand(string path) : Command
 {
     public string Path { get; } = path;
 
-    public override CommandResult Invoke(string[] args)
+    public override CommandResult Invoke(CommandInput input)
     {
         using var process = new Process();
         process.StartInfo.WorkingDirectory = System.IO.Path.GetDirectoryName(Path);
         process.StartInfo.FileName = System.IO.Path.GetFileName(Path);
-        process.StartInfo.Arguments = args.Length > 1
-            ? string.Join(' ', args[1..].Select(QuoteAndEscapeDoubleQuotes))
+        process.StartInfo.Arguments = input.Args.Length > 1
+            ? string.Join(' ', input.Args[1..].Select(QuoteAndEscapeDoubleQuotes))
             : string.Empty;
         process.StartInfo.UseShellExecute = false;
         process.StartInfo.RedirectStandardOutput = true;
+        process.OutputDataReceived += (_, line) =>
+        {
+            if (!string.IsNullOrEmpty(line.Data))
+            {
+                input.Out.WriteLine(line.Data);
+            }
+        };
+        process.StartInfo.RedirectStandardError = true;
+        process.ErrorDataReceived += (_, line) =>
+        {
+            if (!string.IsNullOrEmpty(line.Data))
+            {
+                input.Error.WriteLine(line.Data);
+            }
+        };
         process.StartInfo.WindowStyle = ProcessWindowStyle.Hidden;
         process.StartInfo.CreateNoWindow = true;
         process.Start();
-
-        while (!process.StandardOutput.EndOfStream)
-        {
-            Console.WriteLine(process.StandardOutput.ReadLine());
-        }
-                    
+        
+        process.BeginOutputReadLine();
+        process.BeginErrorReadLine();
         process.WaitForExit();
-                    
+        
         return CommandResult.Continue;
     }
 
@@ -79,7 +92,7 @@ internal class ExternalCommand(string path) : Command
 
 internal class NotFoundCommand(string name) : Command
 {
-    public override CommandResult Invoke(string[] args)
+    public override CommandResult Invoke(CommandInput _)
     {
         Console.WriteLine("{0}: command not found", name);
         return CommandResult.Continue;

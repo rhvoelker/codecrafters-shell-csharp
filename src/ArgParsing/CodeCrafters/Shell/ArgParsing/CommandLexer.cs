@@ -34,7 +34,7 @@ public partial class CommandLexer : Lexer {
 	protected static DFA[] decisionToDFA;
 	protected static PredictionContextCache sharedContextCache = new PredictionContextCache();
 	public const int
-		WS=1, SQUOTE=2, DQUOTE=3, SLASH=4, NON_WS=5;
+		WS=1, SQUOTE=2, DQUOTE=3, SLASH=4, NUMBER=5, REDIRECT=6, NON_WS=7;
 	public static string[] channelNames = {
 		"DEFAULT_TOKEN_CHANNEL", "HIDDEN"
 	};
@@ -44,7 +44,7 @@ public partial class CommandLexer : Lexer {
 	};
 
 	public static readonly string[] ruleNames = {
-		"WS", "SQUOTE", "DQUOTE", "SLASH", "NON_WS"
+		"WS", "SQUOTE", "DQUOTE", "SLASH", "NUMBER", "REDIRECT", "NON_WS"
 	};
 
 
@@ -58,10 +58,10 @@ public partial class CommandLexer : Lexer {
 	}
 
 	private static readonly string[] _LiteralNames = {
-		null, null, "'''", "'\"'", "'\\'"
+		null, null, "'''", "'\"'", "'\\'", null, "'>'"
 	};
 	private static readonly string[] _SymbolicNames = {
-		null, "WS", "SQUOTE", "DQUOTE", "SLASH", "NON_WS"
+		null, "WS", "SQUOTE", "DQUOTE", "SLASH", "NUMBER", "REDIRECT", "NON_WS"
 	};
 	public static readonly IVocabulary DefaultVocabulary = new Vocabulary(_LiteralNames, _SymbolicNames);
 
@@ -91,12 +91,15 @@ public partial class CommandLexer : Lexer {
 		}
 	}
 	private static int[] _serializedATN = {
-		4,0,5,21,6,-1,2,0,7,0,2,1,7,1,2,2,7,2,2,3,7,3,2,4,7,4,1,0,1,0,1,1,1,1,
-		1,2,1,2,1,3,1,3,1,4,1,4,0,0,5,1,1,3,2,5,3,7,4,9,5,1,0,1,3,0,9,10,13,13,
-		32,32,20,0,1,1,0,0,0,0,3,1,0,0,0,0,5,1,0,0,0,0,7,1,0,0,0,0,9,1,0,0,0,1,
-		11,1,0,0,0,3,13,1,0,0,0,5,15,1,0,0,0,7,17,1,0,0,0,9,19,1,0,0,0,11,12,7,
-		0,0,0,12,2,1,0,0,0,13,14,5,39,0,0,14,4,1,0,0,0,15,16,5,34,0,0,16,6,1,0,
-		0,0,17,18,5,92,0,0,18,8,1,0,0,0,19,20,8,0,0,0,20,10,1,0,0,0,1,0,0
+		4,0,7,29,6,-1,2,0,7,0,2,1,7,1,2,2,7,2,2,3,7,3,2,4,7,4,2,5,7,5,2,6,7,6,
+		1,0,1,0,1,1,1,1,1,2,1,2,1,3,1,3,1,4,1,4,1,5,1,5,1,6,1,6,0,0,7,1,1,3,2,
+		5,3,7,4,9,5,11,6,13,7,1,0,2,3,0,9,10,13,13,32,32,1,0,48,57,28,0,1,1,0,
+		0,0,0,3,1,0,0,0,0,5,1,0,0,0,0,7,1,0,0,0,0,9,1,0,0,0,0,11,1,0,0,0,0,13,
+		1,0,0,0,1,15,1,0,0,0,3,17,1,0,0,0,5,19,1,0,0,0,7,21,1,0,0,0,9,23,1,0,0,
+		0,11,25,1,0,0,0,13,27,1,0,0,0,15,16,7,0,0,0,16,2,1,0,0,0,17,18,5,39,0,
+		0,18,4,1,0,0,0,19,20,5,34,0,0,20,6,1,0,0,0,21,22,5,92,0,0,22,8,1,0,0,0,
+		23,24,7,1,0,0,24,10,1,0,0,0,25,26,5,62,0,0,26,12,1,0,0,0,27,28,8,0,0,0,
+		28,14,1,0,0,0,1,0,0
 	};
 
 	public static readonly ATN _ATN =

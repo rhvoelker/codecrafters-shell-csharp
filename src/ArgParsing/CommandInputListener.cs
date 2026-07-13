@@ -1,14 +1,21 @@
 ﻿using System.Text;
-using Antlr4.Runtime.Tree;
 
 namespace CodeCrafters.Shell.ArgParsing;
 
-internal class ArgListener : CommandBaseListener
+internal class CommandInputListener : CommandBaseListener
 {
     private readonly List<string> _args = [];
     private readonly StringBuilder _currentArg = new();
+    private Action _exitArgAction;
     
     public string[] Args => _args.ToArray();
+    
+    public string? OutputFilePath { get; private set; }
+
+    public CommandInputListener()
+    {
+        _exitArgAction = AddCurrentArgToArgsList;
+    }
     
     public override void EnterArg(CommandParser.ArgContext context) => _currentArg.Clear();
 
@@ -27,8 +34,22 @@ internal class ArgListener : CommandBaseListener
     public override void ExitDoubleStringText(CommandParser.DoubleStringTextContext context) =>
         _currentArg.Append(context.GetText());
 
-    public override void ExitArg(CommandParser.ArgContext context) =>
-        _args.Add(_currentArg.ToString());
+    public override void ExitArg(CommandParser.ArgContext context) => _exitArgAction.Invoke();
     
+    public override void EnterRed(CommandParser.RedContext context) => _exitArgAction = SetOutputFilePathToCurrentArg;
+
+    public override void ExitRed_stream(CommandParser.Red_streamContext context) =>
+        _exitArgAction = context.GetText() switch
+        {
+            "1" => SetOutputFilePathToCurrentArg,
+            { } s => throw new Exception($"{s} is not a known output stream for redirection.")
+        };
+    
+    public override void ExitRed(CommandParser.RedContext context) => _exitArgAction = AddCurrentArgToArgsList;
+
+    private void AddCurrentArgToArgsList() => _args.Add(_currentArg.ToString());
+    
+    private void SetOutputFilePathToCurrentArg() => OutputFilePath = _currentArg.ToString();
+
     private static string Unescape(string s) => s.Length > 1 ? s[1..] : s;
 }

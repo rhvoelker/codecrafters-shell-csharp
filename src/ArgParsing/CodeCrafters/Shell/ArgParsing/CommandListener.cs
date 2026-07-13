@@ -52,6 +52,26 @@ public interface ICommandListener : IParseTreeListener {
 	/// <param name="context">The parse tree.</param>
 	void ExitArg([NotNull] CommandParser.ArgContext context);
 	/// <summary>
+	/// Enter a parse tree produced by <see cref="CommandParser.red"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	void EnterRed([NotNull] CommandParser.RedContext context);
+	/// <summary>
+	/// Exit a parse tree produced by <see cref="CommandParser.red"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	void ExitRed([NotNull] CommandParser.RedContext context);
+	/// <summary>
+	/// Enter a parse tree produced by <see cref="CommandParser.red_stream"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	void EnterRed_stream([NotNull] CommandParser.Red_streamContext context);
+	/// <summary>
+	/// Exit a parse tree produced by <see cref="CommandParser.red_stream"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	void ExitRed_stream([NotNull] CommandParser.Red_streamContext context);
+	/// <summary>
 	/// Enter a parse tree produced by the <c>EscapeCharacter</c>
 	/// labeled alternative in <see cref="CommandParser.str"/>.
 	/// </summary>

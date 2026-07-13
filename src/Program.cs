@@ -1,5 +1,3 @@
-using System.Reflection;
-
 namespace CodeCrafters.Shell;
 
 internal class Program
@@ -11,17 +9,19 @@ internal class Program
         while (!result.ShouldExit)
         {
             Console.Write("$ ");
-            var input = Console.ReadLine() ?? string.Empty;
-            var args = ArgEvaluator.Eval(input);
-            var command = Command.Get(args[0]);
+            var input = CommandInputEvaluator.Eval(Console.ReadLine() ?? string.Empty);
 
             try
             {
-                result = command.Invoke(args);
+                result = Command.Get(input.Args[0]).Invoke(input);
             }
             catch (Exception e)
             {
-                Console.WriteLine(e);
+                input.Error.WriteLine(e);
+            }
+            finally
+            {
+                input.TryCloseWriters();
             }
         }
     }

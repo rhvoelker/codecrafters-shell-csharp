@@ -45,6 +45,18 @@ public interface ICommandVisitor<Result> : IParseTreeVisitor<Result> {
 	/// <return>The visitor result.</return>
 	Result VisitArg([NotNull] CommandParser.ArgContext context);
 	/// <summary>
+	/// Visit a parse tree produced by <see cref="CommandParser.red"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	/// <return>The visitor result.</return>
+	Result VisitRed([NotNull] CommandParser.RedContext context);
+	/// <summary>
+	/// Visit a parse tree produced by <see cref="CommandParser.red_stream"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	/// <return>The visitor result.</return>
+	Result VisitRed_stream([NotNull] CommandParser.Red_streamContext context);
+	/// <summary>
 	/// Visit a parse tree produced by the <c>EscapeCharacter</c>
 	/// labeled alternative in <see cref="CommandParser.str"/>.
 	/// </summary>
