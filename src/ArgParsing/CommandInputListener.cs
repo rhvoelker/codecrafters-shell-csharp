@@ -11,6 +11,8 @@ internal class CommandInputListener : CommandBaseListener
     public string[] Args => _args.ToArray();
     
     public string? OutputFilePath { get; private set; }
+    
+    public string? ErrorFilePath { get; private set; }
 
     public CommandInputListener()
     {
@@ -42,6 +44,7 @@ internal class CommandInputListener : CommandBaseListener
         _exitArgAction = context.GetText() switch
         {
             "1" => SetOutputFilePathToCurrentArg,
+            "2" => SetErrorFilePathToCurrentArg,
             { } s => throw new Exception($"{s} is not a known output stream for redirection.")
         };
     
@@ -50,6 +53,8 @@ internal class CommandInputListener : CommandBaseListener
     private void AddCurrentArgToArgsList() => _args.Add(_currentArg.ToString());
     
     private void SetOutputFilePathToCurrentArg() => OutputFilePath = _currentArg.ToString();
+    
+    private void SetErrorFilePathToCurrentArg() => ErrorFilePath = _currentArg.ToString();
 
     private static string Unescape(string s) => s.Length > 1 ? s[1..] : s;
 }

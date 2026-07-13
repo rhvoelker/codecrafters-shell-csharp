@@ -26,10 +26,23 @@ internal static class CommandInputEvaluator
             
             outWriter = new StreamWriter(File.Create(listener.OutputFilePath));
         }
+        
+        var errorWriter = Console.Error;
+
+        if (listener.ErrorFilePath != null)
+        {
+            var directoryName = Path.GetDirectoryName(listener.ErrorFilePath);
+            if (!string.IsNullOrEmpty(directoryName))
+            {
+                Directory.CreateDirectory(directoryName);
+            }
+            
+            errorWriter = new StreamWriter(File.Create(listener.ErrorFilePath));
+        }
 
         return new CommandInput(
             outWriter,
-            Console.Error,
+            errorWriter,
             listener.Args);
     }
 }
